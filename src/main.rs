@@ -7,7 +7,7 @@ fn main () {
 
 fn calculate_age(year: i32, month: u8, day: u8) -> Result<i32, String>{
     let month_ext = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    if month > 12 || month < 1 {
+    if !(1..=12).contains(&month) {
         return Err("Month cannot be greater than 12".to_string());
     }
 
@@ -37,9 +37,7 @@ fn calculate_age(year: i32, month: u8, day: u8) -> Result<i32, String>{
     let current_day = current_date.day();
     let current_year = current_date.year();
 
-    if month > current_month as u8 {
-        Ok(current_year - year - 1)
-    } else if month == current_month as u8 && day > current_day as u8 {
+    if month > current_month as u8 || month == current_month as u8 && day > current_day as u8 {
         Ok(current_year - year - 1)
     } else {
         Ok(current_year - year)
