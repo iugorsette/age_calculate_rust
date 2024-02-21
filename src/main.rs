@@ -1,38 +1,39 @@
-use chrono::Datelike;
+use chrono::{Datelike, Month};
+use num_traits::FromPrimitive;
 
-fn main () {
+fn main() {
     let age = calculate_age(1997, 4, 1).unwrap();
     println!("{}", age);
 }
 
-fn calculate_age(year: i32, month: u8, day: u8) -> Result<i32, String>{
-    let month_ext = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+fn calculate_age(year: i32, month: u8, day: u8) -> Result<i32, String> {
     if !(1..=12).contains(&month) {
         return Err("Month cannot be greater than 12".to_string());
     }
-
+    
     match month {
         2 => {
             if year % 4 == 0 && day > 29 {
-                return Err(format!("Day cannot be greater than 29 on {}", month_ext[month as usize - 1]));
-            } else if day > 28 && year % 4 != 0{
-                return Err(format!("Day cannot be greater than 28 on {}", month_ext[month as usize - 1]));
+                return format_err(month, day);
             }
-        },
+            if day > 28 && year % 4 != 0 {
+                return format_err(month, day);
+            }
+        }
         4 | 6 | 9 | 11 => {
             if day > 30 {
-                return Err(format!("Day cannot be greater than 30 on {}", month_ext[month as usize - 1]));
+                return format_err(month, day);
             }
-        },
+        }
         _ => {
             if day > 31 {
-                return Err(format!("Day cannot be greater than 31 on {}", month_ext[month as usize - 1]));
+                return format_err(month, day);
             }
         }
     }
-        
+
     let current_date = chrono::Utc::now();
-    
+
     let current_month = current_date.month();
     let current_day = current_date.day();
     let current_year = current_date.year();
@@ -42,4 +43,12 @@ fn calculate_age(year: i32, month: u8, day: u8) -> Result<i32, String>{
     } else {
         Ok(current_year - year)
     }
+}
+
+fn format_err(month: u8, day: u8) -> Result<i32, String> {
+    return Err(format!(
+        "Day {} not exists on month {:?}",
+        day,
+        Month::from_u32(month as u32).unwrap()
+    ));
 }
